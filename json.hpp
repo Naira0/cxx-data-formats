@@ -256,7 +256,7 @@ namespace JSON
 
                 if (c == '\\' && allow_escaping)
                 {
-                    char escaped = escape_string(peek());
+                    char escaped = escape_string(advance());
                     if (escaped == '\0')
                     {
                         m_error = "illegal escape character found";
