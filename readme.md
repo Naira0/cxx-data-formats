@@ -5,7 +5,7 @@ i got bored and wrote a json parser in C++ so i thought i make a repository for 
 i packaged it with my fmt lib for convenience.
 
 ## JSON api
-###parser usage
+### parser usage
 fairly straightforward
 ```c++
     JSON::Parser parser(raw_json);
@@ -21,7 +21,7 @@ fairly straightforward
 
     fmt::print("{}\n", index.value());
 ```
-###object usage
+### object usage
 thanks to some C++ fuckery the api is much like one you would see in a python json parser
 ```c++
     JSON::object_t json

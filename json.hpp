@@ -42,7 +42,6 @@ namespace JSON
             object_t,
             array_t>;
 
-    // I really hate templates
     struct Value : public value_t
     {
         Value() = default;
@@ -229,12 +228,45 @@ namespace JSON
             }
         }
 
-        std::string parse_string()
+        char escape_string(char c)
+        {
+            switch (c)
+            {
+                case '"':  return '"';
+                case '\\': return '\\';
+                case '/':  return '/';
+                case 'b':  return '\b';
+                case 'f':  return '\f';
+                case 'n':  return '\n';
+                case 'r':  return '\r';
+                case 't':  return '\t';
+                default: return '\0';
+            }
+        }
+
+        std::string parse_string(bool allow_escaping)
         {
             m_current++;
 
+            std::string output;
+
             while (!at_end() && peek() != '"')
-                m_offset++;
+            {
+                char c = advance();
+
+                if (c == '\\' && allow_escaping)
+                {
+                    char escaped = escape_string(peek());
+                    if (escaped == '\0')
+                    {
+                        m_error = "illegal escape character found";
+                        return {};
+                    }
+                    output += escaped;
+                }
+                else
+                    output += c;
+            }
 
             if (peek() != '"')
             {
@@ -242,11 +274,9 @@ namespace JSON
                 return {};
             }
 
-            std::string str = slice();
-
             m_offset++;
 
-            return str;
+            return output;
         }
 
         double parse_number()
@@ -299,7 +329,7 @@ namespace JSON
 
             switch (c)
             {
-                case '"': return parse_string();
+                case '"': return parse_string(true);
                 case '[': return parse_array();
                 case '{': return parse_object();
                 default:
@@ -327,7 +357,7 @@ namespace JSON
 
         record_t parse_record()
         {
-            std::string key = parse_string();
+            std::string key = parse_string(false);
 
             skip_chars();
 
