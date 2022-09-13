@@ -6,7 +6,7 @@
 #include <string_view>
 #include <sstream>
 
-#include "json.hpp"
+#include "json/type.hpp"
 
 namespace fmt
 {
@@ -28,6 +28,11 @@ namespace fmt
         return ss.str();
     }
 
+    inline std::string to_string(char c)
+    {
+        return { c };
+    }
+
     inline std::string to_string(std::nullptr_t ptr)
     {
         return "null";
@@ -38,9 +43,6 @@ namespace fmt
         return b ? "true" : "false";
     }
 
-    template<typename T>
-    inline std::string string_of(const T& value);
-
     std::string string_of(const JSON::Value& value)
     {
         return value.to_string();
@@ -49,8 +51,12 @@ namespace fmt
     template<typename T>
     inline std::string string_of(const T& value)
     {
-        if constexpr(std::is_arithmetic_v<T> && !std::is_same_v<T, bool>)
+        // if not a number or a bool or a char convert it to a string
+        if constexpr(std::is_arithmetic_v<T>
+                     && !std::is_same_v<T, bool>
+                     && !std::is_same_v<T, char>)
             return std::to_string(value);
+            // if not null and can construct a string
         else if constexpr(
                 std::is_constructible_v<std::string, T>
                 && !std::is_same_v<T, std::nullptr_t>)
@@ -134,5 +140,18 @@ namespace fmt
     inline int print(std::string_view fmt, A&&... a)
     {
         return std::printf(format(fmt, std::forward<A>(a)...).data());
+    }
+
+    template<typename... A>
+    inline int println(std::string_view fmt, A&&... a)
+    {
+        return std::puts(format(fmt, std::forward<A>(a)...).data());
+    }
+
+    template<typename... A>
+    inline void fatal(std::string_view fmt, A&&... a)
+    {
+        std::printf(format(fmt, std::forward<A>(a)...).data());
+        std::exit(-1);
     }
 }

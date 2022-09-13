@@ -1,8 +1,8 @@
 # cxx data formats
 
-i got bored and wrote a json parser in C++ so i thought i make a repository for any future parsers i write for stuff similar to json.
+I got bored and wrote a json parser in C++ so i thought i make a repository for any future parsers i write for stuff similar to json.
 
-i packaged it with my fmt lib for convenience.
+I packaged it with my fmt lib for convenience.
 
 ## JSON api
 ### parser usage
