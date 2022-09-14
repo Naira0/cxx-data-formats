@@ -63,35 +63,43 @@ namespace dtf
         Map(std::initializer_list<Record<K&&, V&&>> list)
         {
             m_size = list.size();
-            construct(m_size);
+
+            construct(m_size * 2);
 
             for (auto &[key, value] : list)
                 set(std::forward<K>(key), std::forward<V>(value));
         }
 
-        void construct(int n)
-        {
-            m_capacity = n * 2;
-            m_bucket   = new Chain[m_capacity];
-
-            for (int i = 0; i < m_capacity; i++)
-                m_bucket[i] = Chain();
-        }
-
         Map()
         {
-            constexpr int n = 10;
+            construct(10);
+        }
 
-            m_bucket = new Chain[n];
-            m_capacity = n;
+        Map(Map<K, V> &&map) noexcept
+        {
+           move(std::forward<Map<K, V>>(map));
+        }
 
-            for (int i = 0; i < n; i++)
-                m_bucket[i] = Chain();
+        Map(const Map<K, V> &map)
+        {
+            copy(map);
         }
 
         ~Map()
         {
             delete[] m_bucket;
+        }
+
+        Map<K, V>& operator=(Map<K, V> &&map) noexcept
+        {
+            move(std::forward<Map<K, V>>(map));
+            return *this;
+        }
+
+        Map<K, V>& operator=(const Map<K, V> &map)
+        {
+            copy(map);
+            return *this;
         }
 
         [[nodiscard]]
@@ -188,12 +196,8 @@ namespace dtf
 
             delete[] m_bucket;
 
-            m_capacity = 10;
-            m_bucket   = new Chain[m_capacity];
-            m_size     = 0;
-
-            for (int i = 0; i < m_capacity; i++)
-                m_bucket[i] = Chain();
+            m_size = 0;
+            construct(10);
         }
 
         auto begin() const
@@ -248,6 +252,15 @@ namespace dtf
             return nullptr;
         }
 
+        inline void construct(int n)
+        {
+            m_capacity = n;
+            m_bucket   = new Chain[m_capacity];
+
+            for (int i = 0; i < m_capacity; i++)
+                m_bucket[i] = Chain();
+        }
+
         void rehash()
         {
             const size_t n = m_capacity;
@@ -283,6 +296,30 @@ namespace dtf
             delete[] m_bucket;
 
             m_bucket = temp;
+        }
+
+        void move(Map<K, V> &&map) noexcept
+        {
+            m_bucket = map.m_bucket;
+            map.m_bucket = nullptr;
+
+            m_size = map.m_size;
+            m_capacity = map.m_capacity;
+
+            m_items = std::move(map.m_items);
+        }
+
+        void copy(const Map<K, V> &map)
+        {
+            m_items = map.m_items;
+
+            m_capacity = map.m_capacity;
+            m_size = map.m_size;
+
+            m_bucket = new Chain[m_capacity];
+
+            for (size_t i = 0; i < m_capacity; i++)
+                m_bucket[i] = map.m_bucket[i];
         }
     };
 }
