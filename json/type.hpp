@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 
+#include "../map.hpp"
 
 namespace fmt
 {
@@ -24,7 +25,7 @@ namespace JSON
     struct Value;
 
     //  NOTE does not preserve insertion order
-    using object_t = std::map<std::string, Value>;
+    using object_t = dtf::Map<std::string, Value>;
     using array_t = std::vector<Value>;
     using record_t = std::pair<std::string, Value>;
 
@@ -45,6 +46,17 @@ namespace JSON
         {
             set_value(std::forward<T>(value));
         }
+
+//        Value &operator=(Value &&value) noexcept
+//        {
+//
+//            return *this;
+//        }
+//
+//        Value &operator=(const Value &value) noexcept
+//        {
+//            return *this;
+//        }
 
         Value &operator=(object_t &&value)
         {

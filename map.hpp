@@ -5,43 +5,78 @@
 #include <vector>
 #include <list>
 #include <optional>
+#include <initializer_list>
+
+#include <iostream>
 
 namespace dtf
 {
+    template<typename K, typename V>
+    struct Record
+    {
+        K key;
+        V value;
+
+        Record(K &&key, V &&value) :
+                key(std::move(key)),
+                value(std::move(value))
+        {}
+
+        Record(const K &key, const V &value) :
+                key(key),
+                value(value)
+        {}
+
+        Record(Record &&item) noexcept :
+                key(std::move(item.key)),
+                value(std::move(item.value))
+        {}
+
+        Record(const Record &item) noexcept :
+                key(item.key),
+                value(item.value)
+        {}
+
+        Record& operator=(const Record &item)
+        {
+            key = item.key;
+            value = item.value;
+            return *this;
+        }
+
+        Record& operator=(Record &&item) noexcept
+        {
+            key = std::move(item.key);
+            value = std::move(item.value);
+            return *this;
+        }
+    };
+
     // a hash table implementation that maintains insertion order using std::list
     template<class K, class V>
     class Map
     {
     public:
-
-        struct Item
-        {
-            K key;
-            V value;
-
-            Item(K &&key, V &&value) :
-                    key(key),
-                    value(value)
-            {}
-
-            Item(const K &key, const V &value) :
-                    key(key),
-                    value(value)
-            {}
-
-            Item(Item &&item) noexcept :
-                    key(std::move(item.key)),
-                    value(std::move(item.value))
-            {}
-
-            Item(const Item &item) noexcept :
-                    key(item.key),
-                    value(item.value)
-            {}
-        };
-
-        using IterType = typename std::list<Item>::iterator;
+        using IterType = typename std::list<Record<K, V>>::iterator;
         using Chain = std::list<IterType>;
+
+        Map(std::initializer_list<Record<K&&, V&&>> list)
+        {
+            m_size = list.size();
+            construct(m_size);
+
+            for (auto &[key, value] : list)
+                set(std::forward<K>(key), std::forward<V>(value));
+        }
+
+        void construct(int n)
+        {
+            m_capacity = n * 2;
+            m_bucket   = new Chain[m_capacity];
+
+            for (int i = 0; i < m_capacity; i++)
+                m_bucket[i] = Chain();
+        }
 
         Map()
         {
@@ -80,16 +115,22 @@ namespace dtf
             return !m_size;
         }
 
-        Item& set(const K &key, const V &value)
+        Record<K, V>& set(K &&key, V &&value)
         {
-            Item item(key, value);
+            Record<K, V> item(std::forward<K>(key), std::forward<V>(value));
+            return set_item(item);
+        }
+
+        Record<K, V>& set(const K &key, V &&value)
+        {
+            Record<K, V> item(key, value);
             return set_item(item);
         }
 
         template<class ...A>
-        Item& emplace(A &&...a)
+        Record<K, V>& emplace(A &&...a)
         {
-            Item item(a...);
+            Record<K, V> item(a...);
             return set_item(item);
         }
 
@@ -155,12 +196,12 @@ namespace dtf
                 m_bucket[i] = Chain();
         }
 
-        auto begin()
+        auto begin() const
         {
             return m_items.begin();
         }
 
-        auto end()
+        auto end() const
         {
             return m_items.end();
         }
@@ -169,10 +210,10 @@ namespace dtf
         size_t m_size{};
         size_t m_capacity{};
         Chain *m_bucket{};
-        std::list<Item> m_items;
+        std::list<Record<K, V>> m_items;
         std::hash<K> m_hash;
 
-        Item& set_item(Item &item)
+        Record<K, V>& set_item(Record<K, V> &item)
         {
             m_size++;
 

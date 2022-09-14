@@ -20,8 +20,11 @@ namespace fmt
     template<is_iterable T>
     std::string to_string(const T& container);
 
-    template<typename A, typename B>
-    std::string to_string(const std::pair<const A, B>& pair);
+//    template<typename A, typename B>
+//    std::string to_string(const std::pair<const A, B>& pair);
+
+    template<typename K, typename V>
+    std::string to_string(const dtf::Record<K, V> &record);
 
     inline std::string to_string(std::stringstream& ss)
     {
@@ -65,10 +68,16 @@ namespace fmt
             return fmt::to_string(value);
     }
 
-    template<typename A, typename B>
-    inline std::string to_string(const std::pair<const A, B>& pair)
+//    template<typename A, typename B>
+//    inline std::string to_string(const std::pair<const A, B>& pair)
+//    {
+//        return (string_of(pair.first) + ": " + string_of(pair.second));
+//    }
+
+    template<typename K, typename V>
+    std::string to_string(const dtf::Record<K, V> &record)
     {
-        return (string_of(pair.first) + ": " + string_of(pair.second));
+        return (string_of(record.key) + ": " + string_of(record.value));
     }
 
     template<is_iterable T>
