@@ -6,7 +6,7 @@
 #include <string_view>
 #include <sstream>
 
-#include "json/type.hpp"
+#include "map.hpp"
 
 namespace fmt
 {
@@ -20,8 +20,8 @@ namespace fmt
     template<is_iterable T>
     std::string to_string(const T& container);
 
-//    template<typename A, typename B>
-//    std::string to_string(const std::pair<const A, B>& pair);
+    template<typename A, typename B>
+    std::string to_string(const std::pair<const A, B>& pair);
 
     template<typename K, typename V>
     std::string to_string(const dtf::Record<K, V> &record);
@@ -46,10 +46,10 @@ namespace fmt
         return b ? "true" : "false";
     }
 
-    std::string string_of(const JSON::Value& value)
-    {
-        return value.to_string();
-    }
+//    std::string string_of(const JSON::Value& value)
+//    {
+//        return value.to_string();
+//    }
 
     template<typename T>
     inline std::string string_of(const T& value)
@@ -68,11 +68,11 @@ namespace fmt
             return fmt::to_string(value);
     }
 
-//    template<typename A, typename B>
-//    inline std::string to_string(const std::pair<const A, B>& pair)
-//    {
-//        return (string_of(pair.first) + ": " + string_of(pair.second));
-//    }
+    template<typename A, typename B>
+    inline std::string to_string(const std::pair<const A, B>& pair)
+    {
+        return (string_of(pair.first) + ": " + string_of(pair.second));
+    }
 
     template<typename K, typename V>
     std::string to_string(const dtf::Record<K, V> &record)

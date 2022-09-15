@@ -12,12 +12,6 @@
 
 #include "type.hpp"
 
-namespace fmt
-{
-    template<typename... A>
-    inline int print(std::string_view fmt, A&&... a);
-}
-
 namespace JSON
 {
     class Parser

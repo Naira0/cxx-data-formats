@@ -8,11 +8,11 @@
 
 #include "../map.hpp"
 
-namespace fmt
-{
-    template<typename T>
-    inline std::string string_of(const T &value);
-}
+//namespace fmt
+//{
+//    template<typename T>
+//    inline std::string string_of(const T &value);
+//}
 
 namespace JSON
 {
@@ -77,24 +77,24 @@ namespace JSON
             return *this;
         }
 
-        std::string to_string() const
-        {
-            using namespace JSON;
-
-#define GET(T) case T: return fmt::string_of(std::get<T>(*this))
-
-            switch (index())
-            {
-                GET(String);
-                GET(Number);
-                GET(Bool);
-                GET(Null);
-                GET(Object);
-                GET(Array);
-            }
-
-#undef GET
-        }
+//        std::string to_string() const
+//        {
+//            using namespace JSON;
+//
+//#define GET(T) case T: return fmt::string_of(std::get<T>(*this))
+//
+//            switch (index())
+//            {
+//                GET(String);
+//                GET(Number);
+//                GET(Bool);
+//                GET(Null);
+//                GET(Object);
+//                GET(Array);
+//            }
+//
+//#undef GET
+//        }
 
 
     private:

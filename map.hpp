@@ -165,6 +165,24 @@ namespace dtf
             return value ? *value : const_cast<V&>(def_value);
         }
 
+        // gets all values of duplicate keys
+        std::vector<V*> get_all(const K &key) const
+        {
+            size_t h = hash(key);
+
+            std::vector<V*> output;
+
+            std::cout << m_bucket[h].size() << '\n';
+
+            for (IterType item : m_bucket[h])
+            {
+                if (item->key == key)
+                    output.push_back(&item->value);
+            }
+
+            return output;
+        }
+
         bool contains(const K &key) const
         {
             return search(key);
@@ -219,9 +237,7 @@ namespace dtf
 
         Record<K, V>& set_item(Record<K, V> &item)
         {
-            m_size++;
-
-            if (m_size >= m_capacity)
+            if (++m_size >= m_capacity)
                 rehash();
 
             size_t h = hash(item.key);
